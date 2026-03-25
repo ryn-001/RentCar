@@ -1,43 +1,31 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
-
-axios.defaults.baseURL = "http://localhost:8082"; 
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkLoggedIn = async () => {
-            try {
-                const res = await axios.get('/api/auth/me');
-                setUser(res.data.user);
-            } catch (err) {
-                setUser(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-        checkLoggedIn();
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
     }, []);
 
-    const login = async (email, password) => {
-        const res = await axios.post('/api/auth/login', { email, password });
-        setUser(res.data.user);
-        return res.data;
+    const login = (data) => {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("token", data.token);
+        setUser(data.user);
     };
 
-    const logout = async () => {
-        await axios.post('/api/auth/logout');
+    const logout = () => {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
         setUser(null);
     };
 
-    if (loading) return <div>Loading...</div>; 
-
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, setUser, logout }}>
             {children}
         </AuthContext.Provider>
     );

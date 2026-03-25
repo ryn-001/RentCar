@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { TextField, Button, Container, Typography, Box, Alert } from '@mui/material';
+import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { config } from '../config';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { setUser } = useAuth();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,22 +18,33 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        try {
-            const res = await login(formData.email, formData.password);
 
-            if (res.user.role === 'admin') {
-                navigate('/add-car');
-            } else {
+        try {
+            const res = await axios.post(
+                `${config.endpoint}/users/login`,
+                formData
+            );
+
+            const { token, user } = res.data;
+
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
+
+            toast.success("Login successful");
+
+            setTimeout(() => {
                 navigate('/');
-            }
+                setUser(user);
+            }, 1500);
+
         } catch (err) {
-            setError(err.response?.data?.message || 'Invalid credentials');
+            toast.error(err.response?.data?.message || 'Invalid credentials');
         }
     };
 
     return (
         <Container maxWidth="xs">
+            <ToastContainer />
             <Box
                 sx={{
                     mt: 10,
@@ -44,12 +58,6 @@ const Login = () => {
                 <Typography variant="h5" align="center" sx={{ color: '#ff7a00', mb: 2 }}>
                     Login
                 </Typography>
-
-                {error && (
-                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-                        {error}
-                    </Alert>
-                )}
 
                 <Box component="form" onSubmit={handleSubmit}>
                     <TextField

@@ -29,4 +29,4 @@ const vehicleValidationSchema = Joi.object({
         .required()
 });
 
-module.exports = vehicleValidationSchema;
+module.exports = {vehicleValidationSchema};

@@ -1,13 +1,19 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import {config} from "../config"
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Register() {
     const navigate = useNavigate();
+
     const [form, setForm] = useState({
-        name: "",
+        fullname: "",
+        username: "",
         email: "",
-        password: ""
+        password: "",
+        confirmPassword: ""
     });
 
     const handleChange = (e) => {
@@ -16,11 +22,23 @@ export default function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (form.password !== form.confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+
         try {
-            await axios.post("http://localhost:8082/api/users/register", form);
-            navigate("/login");
+            await axios.post(`${config.endpoint}/users/register`, {
+                fullname: form.fullname,
+                username: form.username,
+                email: form.email,
+                password: form.password
+            });
+            toast.success("Registration successful");
+            setTimeout(() => navigate("/login"), 1500);
         } catch (err) {
-            alert("Registration failed");
+            toast.error("Registration failed");
         }
     };
 
@@ -34,6 +52,7 @@ export default function Register() {
             padding: "20px",
             fontFamily: "sans-serif"
         }}>
+            <ToastContainer />
             <form onSubmit={handleSubmit} style={{
                 backgroundColor: "#262626",
                 padding: "40px",
@@ -46,94 +65,64 @@ export default function Register() {
                 <h2 style={{ color: "#fff", fontSize: "28px", marginBottom: "10px", textAlign: "center" }}>
                     Join <span style={{ color: "#ff7a00" }}>RentCar</span>
                 </h2>
-                <p style={{ color: "#aaa", textAlign: "center", marginBottom: "30px", fontSize: "14px" }}>
-                    Create an account to start booking
-                </p>
 
-                <div style={{ marginBottom: "20px" }}>
-                    <label style={{ display: "block", color: "#eee", marginBottom: "8px", fontSize: "14px" }}>Full Name</label>
-                    <input 
-                        name="name" 
-                        placeholder="John Doe" 
-                        onChange={handleChange} 
-                        required
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "6px",
-                            border: "1px solid #444",
-                            backgroundColor: "#1a1a1a",
-                            color: "#fff",
-                            fontSize: "15px",
-                            outline: "none",
-                            boxSizing: "border-box"
-                        }}
-                    />
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ color: "#eee" }}>Full Name</label>
+                    <input name="fullname" onChange={handleChange} required style={inputStyle}/>
+                </div>
+
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ color: "#eee" }}>Username</label>
+                    <input name="username" onChange={handleChange} required style={inputStyle}/>
+                </div>
+
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ color: "#eee" }}>Email</label>
+                    <input type="email" name="email" onChange={handleChange} required style={inputStyle}/>
+                </div>
+
+                <div style={{ marginBottom: "15px" }}>
+                    <label style={{ color: "#eee" }}>Password</label>
+                    <input type="password" name="password" onChange={handleChange} required style={inputStyle}/>
                 </div>
 
                 <div style={{ marginBottom: "20px" }}>
-                    <label style={{ display: "block", color: "#eee", marginBottom: "8px", fontSize: "14px" }}>Email Address</label>
-                    <input 
-                        name="email" 
-                        type="email"
-                        placeholder="name@example.com" 
-                        onChange={handleChange} 
-                        required
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "6px",
-                            border: "1px solid #444",
-                            backgroundColor: "#1a1a1a",
-                            color: "#fff",
-                            fontSize: "15px",
-                            outline: "none",
-                            boxSizing: "border-box"
-                        }}
-                    />
+                    <label style={{ color: "#eee" }}>Confirm Password</label>
+                    <input type="password" name="confirmPassword" onChange={handleChange} required style={inputStyle}/>
                 </div>
 
-                <div style={{ marginBottom: "20px" }}>
-                    <label style={{ display: "block", color: "#eee", marginBottom: "8px", fontSize: "14px" }}>Password</label>
-                    <input 
-                        name="password" 
-                        type="password" 
-                        placeholder="••••••••" 
-                        onChange={handleChange} 
-                        required
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "6px",
-                            border: "1px solid #444",
-                            backgroundColor: "#1a1a1a",
-                            color: "#fff",
-                            fontSize: "15px",
-                            outline: "none",
-                            boxSizing: "border-box"
-                        }}
-                    />
-                </div>
-
-                <button type="submit" style={{
-                    width: "100%",
-                    padding: "12px",
-                    backgroundColor: "#ff7a00",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "6px",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    marginTop: "10px"
-                }}>
+                <button type="submit" style={buttonStyle}>
                     Register
                 </button>
-                
-                <p style={{ color: "#aaa", textAlign: "center", marginTop: "20px", fontSize: "14px" }}>
-                    Already have an account? <Link to="/login" style={{ color: "#ff7a00", textDecoration: "none", fontWeight: "500" }}>Login</Link>
+
+                <p style={{ color: "#aaa", textAlign: "center", marginTop: "20px" }}>
+                    Already have an account?{" "}
+                    <Link to="/login" style={{ color: "#ff7a00" }}>Login</Link>
                 </p>
             </form>
         </div>
     );
 }
+
+const inputStyle = {
+    width: "100%",
+    padding: "12px",
+    borderRadius: "6px",
+    border: "1px solid #444",
+    backgroundColor: "#1a1a1a",
+    color: "#fff",
+    marginTop: "5px",
+    outline: "none"
+};
+
+const buttonStyle = {
+    width: "100%",
+    padding: "12px",
+    backgroundColor: "#ff7a00",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    fontSize: "16px",
+    fontWeight: "bold",
+    cursor: "pointer"
+};

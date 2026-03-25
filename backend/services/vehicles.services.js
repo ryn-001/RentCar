@@ -1,4 +1,4 @@
-const VehiclesModel = require('../models/index.models');
+const {VehiclesModel} = require('../models/index.models');
 
 const getAllVehicles = async () => {
     return await VehiclesModel.find();

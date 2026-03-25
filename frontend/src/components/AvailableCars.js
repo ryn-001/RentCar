@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { config } from "../config";
 
 export default function AvailableCars() {
     const [cars, setCars] = useState([]);
@@ -10,8 +11,15 @@ export default function AvailableCars() {
 
     useEffect(() => {
         const fetchCars = async () => {
-            const res = await axios.get("/api/cars");
-            setCars(res.data);
+            try {
+                const res = await axios.get(`${config.endpoint}/vehicles`, {
+                    withCredentials: true 
+                });
+                setCars(res.data);
+            } catch (err) {
+                console.error(err);
+                alert("Failed to fetch cars");
+            }
         };
         fetchCars();
     }, []);
@@ -24,15 +32,27 @@ export default function AvailableCars() {
             return;
         }
 
+        if (!startDate) {
+            alert("Please select a date");
+            return;
+        }
+
         try {
-            await axios.post("/api/book", {
-                carId,
-                days,
-                startDate
-            });
+            await axios.post(
+                `${config.endpoint}/bookings`,
+                {
+                    vehicleId: carId,
+                    days,
+                    startDate
+                },
+                {
+                    withCredentials: true 
+                }
+            );
+
             alert("Car booked successfully");
         } catch (err) {
-            alert("Booking failed");
+            alert(err.response?.data?.message || "Booking failed");
         }
     };
 

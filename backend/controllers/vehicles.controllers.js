@@ -1,18 +1,19 @@
-const vehicleService = require('../services/index.services');
+const {VehicleServices} = require('../services/index.services');
 const cloudinary = require('../config/cloudinary');
 
 const getVehicles = async (req, res) => {
     try {
-        const vehicles = await vehicleService.getAllVehicles();
+        const vehicles = await VehicleServices.getAllVehicles();
         res.status(200).json(vehicles);
     } catch (err) {
+        console.log(err.message);
         res.status(500).json({ message: err.message });
     }
 };
 
 const getVehicle = async (req, res) => {
     try {
-        const vehicle = await vehicleService.getVehicleById(req.params.id);
+        const vehicle = await VehicleServices.getVehicleById(req.params.id);
         res.status(200).json(vehicle);
     } catch (err) {
         res.status(404).json({ message: err.message });
@@ -21,7 +22,7 @@ const getVehicle = async (req, res) => {
 
 const createVehicle = async (req, res) => {
     try {
-        const vehicle = await vehicleService.createVehicle({
+        const vehicle = await VehicleServices.createVehicle({
             ...req.body,
             images: []
         });
@@ -40,7 +41,7 @@ const createVehicle = async (req, res) => {
             imageUrls = results.map(result => result.secure_url);
         }
 
-        const updatedVehicle = await vehicleService.updateVehicle(vehicle._id, {
+        const updatedVehicle = await VehicleServices.updateVehicle(vehicle._id, {
             images: imageUrls
         });
 
@@ -74,7 +75,7 @@ const updateVehicle = async (req, res) => {
             updateData.$push = { images: { $each: imageUrls } };
         }
 
-        const vehicle = await vehicleService.updateVehicle(req.params.id, updateData);
+        const vehicle = await VehicleServices.updateVehicle(req.params.id, updateData);
         res.status(200).json(vehicle);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -83,7 +84,7 @@ const updateVehicle = async (req, res) => {
 
 const deleteVehicle = async (req, res) => {
     try {
-        const vehicle = await vehicleService.getVehicleById(req.params.id);
+        const vehicle = await VehicleServices.getVehicleById(req.params.id);
 
         if (vehicle && vehicle.images.length > 0) {
             const publicIds = vehicle.images.map(url => {
@@ -97,7 +98,7 @@ const deleteVehicle = async (req, res) => {
             );
         }
 
-        const result = await vehicleService.deleteVehicle(req.params.id);
+        const result = await VehicleServices.deleteVehicle(req.params.id);
         res.status(200).json(result);
     } catch (err) {
         res.status(404).json({ message: err.message });
