@@ -1,43 +1,139 @@
-import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box, Alert } from '@mui/material';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
-const Register = () => {
-    const [formData, setFormData] = useState({ username: '', fullname: '', email: '', password: '' });
-    const [error, setError] = useState('');
+export default function Register() {
     const navigate = useNavigate();
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        password: ""
+    });
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         try {
-            await axios.post('http://localhost:5000/api/users/register', formData);
-            navigate('/login');
+            await axios.post("http://localhost:8082/api/users/register", form);
+            navigate("/login");
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            alert("Registration failed");
         }
     };
 
     return (
-        <Container maxWidth="xs">
-            <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Typography variant="h5">Register</Typography>
-                {error && <Alert severity="error" sx={{ width: '100%', mt: 2 }}>{error}</Alert>}
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-                    <TextField margin="normal" fullWidth label="Username" name="username" onChange={handleChange} required />
-                    <TextField margin="normal" fullWidth label="Full Name" name="fullname" onChange={handleChange} required />
-                    <TextField margin="normal" fullWidth label="Email" name="email" type="email" onChange={handleChange} required />
-                    <TextField margin="normal" fullWidth label="Password (Lowercase only)" name="password" type="password" onChange={handleChange} required />
-                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3 }}>Sign Up</Button>
-                </Box>
-            </Box>
-        </Container>
-    );
-};
+        <div style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "90vh",
+            backgroundColor: "#1a1a1a",
+            padding: "20px",
+            fontFamily: "sans-serif"
+        }}>
+            <form onSubmit={handleSubmit} style={{
+                backgroundColor: "#262626",
+                padding: "40px",
+                borderRadius: "12px",
+                width: "100%",
+                maxWidth: "400px",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                border: "1px solid #333"
+            }}>
+                <h2 style={{ color: "#fff", fontSize: "28px", marginBottom: "10px", textAlign: "center" }}>
+                    Join <span style={{ color: "#ff7a00" }}>RentCar</span>
+                </h2>
+                <p style={{ color: "#aaa", textAlign: "center", marginBottom: "30px", fontSize: "14px" }}>
+                    Create an account to start booking
+                </p>
 
-export default Register;
+                <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "block", color: "#eee", marginBottom: "8px", fontSize: "14px" }}>Full Name</label>
+                    <input 
+                        name="name" 
+                        placeholder="John Doe" 
+                        onChange={handleChange} 
+                        required
+                        style={{
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "6px",
+                            border: "1px solid #444",
+                            backgroundColor: "#1a1a1a",
+                            color: "#fff",
+                            fontSize: "15px",
+                            outline: "none",
+                            boxSizing: "border-box"
+                        }}
+                    />
+                </div>
+
+                <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "block", color: "#eee", marginBottom: "8px", fontSize: "14px" }}>Email Address</label>
+                    <input 
+                        name="email" 
+                        type="email"
+                        placeholder="name@example.com" 
+                        onChange={handleChange} 
+                        required
+                        style={{
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "6px",
+                            border: "1px solid #444",
+                            backgroundColor: "#1a1a1a",
+                            color: "#fff",
+                            fontSize: "15px",
+                            outline: "none",
+                            boxSizing: "border-box"
+                        }}
+                    />
+                </div>
+
+                <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "block", color: "#eee", marginBottom: "8px", fontSize: "14px" }}>Password</label>
+                    <input 
+                        name="password" 
+                        type="password" 
+                        placeholder="••••••••" 
+                        onChange={handleChange} 
+                        required
+                        style={{
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "6px",
+                            border: "1px solid #444",
+                            backgroundColor: "#1a1a1a",
+                            color: "#fff",
+                            fontSize: "15px",
+                            outline: "none",
+                            boxSizing: "border-box"
+                        }}
+                    />
+                </div>
+
+                <button type="submit" style={{
+                    width: "100%",
+                    padding: "12px",
+                    backgroundColor: "#ff7a00",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    marginTop: "10px"
+                }}>
+                    Register
+                </button>
+                
+                <p style={{ color: "#aaa", textAlign: "center", marginTop: "20px", fontSize: "14px" }}>
+                    Already have an account? <Link to="/login" style={{ color: "#ff7a00", textDecoration: "none", fontWeight: "500" }}>Login</Link>
+                </p>
+            </form>
+        </div>
+    );
+}

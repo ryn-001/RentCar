@@ -1,0 +1,14 @@
+const express = require('express');
+const VehicleRouter = express.Router();
+const {vehicleValidationSchema} = require('../validations/index.validations');
+const {authorize} = require("../middlewares/authorize.middleware");
+const {authenticate} = require("../middlewares/authenticate.middleware");
+const validate = require("../middlewares/validate.middleware");
+const {VehiclesControllers} = require("../controllers/index.controllers");
+
+VehicleRouter.post("/vehicle",validate(vehicleValidationSchema),authenticate,authorize("admin"),VehiclesControllers.createVehicle);
+VehicleRouter.get("vehicles",VehiclesControllers.getVehicles);
+VehicleRouter.put("/vehicle/:id",validate(vehicleValidationSchema),authorize("admin"),VehiclesControllers.updateVehicle);
+VehicleRouter.delete("/vehicle/:id",validate(vehicleValidationSchema),authorize("admin"),VehiclesControllers.deleteVehicle);
+
+module.exports = VehicleRouter;
