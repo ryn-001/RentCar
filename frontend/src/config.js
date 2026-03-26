@@ -1,3 +1,3 @@
 export const config = {
-    endpoint: "http://localhost:8082/api"
+    endpoint: "https://rentcar-2lj6.onrender.com/api"
 }
